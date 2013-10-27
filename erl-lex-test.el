@@ -45,6 +45,7 @@
   (erl-lex-test "\"a\""'((STRING   1 . 4))))
 
 (ert-deftest erl-lex-test-number ()
+  ;; Errors such as $aa $@a $\"a etc have to be caught by the grammar
   (erl-lex-test "16"     '((NUMBER 1 . 3)))
   (erl-lex-test "16#12"  '((NUMBER 1 . 6)))
   (erl-lex-test "16.12"  '((NUMBER 1 . 6)))
@@ -52,8 +53,10 @@
   (erl-lex-test "1.2 e4" '((NUMBER 1 . 4) (ATOM 5 . 7)))
   (should-error (erl-lex-analyze-string "1.2e 3"))
   (erl-lex-test "$a"    '((NUMBER 1 . 3)))
-  (should-error (erl-lex-analyze-string "$aa"))
-  (erl-lex-test "$\\\"" '((NUMBER 1 . 4))))
+  (erl-lex-test "$\\a"    '((NUMBER 1 . 4)))
+  (erl-lex-test "$\\\"" '((NUMBER 1 . 4)))
+  (erl-lex-test "$\"" '((NUMBER 1 . 3)))
+  (should-error (erl-lex-analyze-string "$")))
 
 (ert-deftest erl-lex-test-punctuation ()
   (erl-lex-test "->"  '((RARROW            1 . 3)))

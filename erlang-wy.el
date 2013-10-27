@@ -3,7 +3,7 @@
 ;; Copyright (C) 2002, 2003 Vladimir G. Sekissov
 
 ;; Author: thomas <thomas@brunsnultra>
-;; Created: 2013-10-27 16:00:19+0100
+;; Created: 2013-10-27 17:35:24+0100
 ;; Keywords: syntax
 ;; X-RCS: $Id$
 
@@ -43,7 +43,7 @@
           "\\|"
           "\\(\\([0123]?[0-9]#\\)?[0-9]+\\)" ;; integer
           "\\|"
-          "\\(\\$\\(\\\\\\)?.\\)" ;; char
+          "\\(\\$\\\\?.\\)" ;; char
           "\\)")
     "Regexp describing an Erlang number expression")
 

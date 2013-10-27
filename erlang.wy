@@ -29,7 +29,7 @@
           "\\|"
           "\\(\\([0123]?[0-9]#\\)?[0-9]+\\)" ;; integer
           "\\|"
-          "\\(\\$\\(\\\\\\)?.\\)" ;; char
+          "\\(\\$\\\\?.\\)" ;; char
           "\\)")
     "Regexp describing an Erlang number expression")
 %}
