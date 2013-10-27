@@ -34,24 +34,6 @@
 (when (member 'ert features)
   (require 'erl-lex-test))
 
-(defconst erl-lex-multichar-punctuation-regexp
-  (regexp-opt
-   '("->" "--" "==" "=:=" "=/=" "=<" "/=" ">=" ">>" "++" "<<" "||"))
-  "Regexp for identifying multicharacter punctuation tokens.")
-
-(define-lex-simple-regex-analyzer erl-lex-multichar-punctuation
-  "Detect and create multicharacter Erlang punctuation tokens."
-  erl-lex-multichar-punctuation-regexp
-  'punctuation)
-
-(define-lex-analyzer erl-lex-keyword
-  "Detect and create Erlang keyword tokens"
-  (and (looking-at "\\(\\sw\\|\\s_\\)+")
-       (semantic-lex-keyword-p (match-string 0)))
-  (semantic-lex-push-token
-   (semantic-lex-token (semantic-lex-keyword-symbol (match-string 0))
-                       (match-beginning 0) (match-end 0))))
-
 (define-lex erl-lex
   "Lexical Analyzer for Erlang code."
   semantic-lex-ignore-whitespace
@@ -64,8 +46,7 @@
   erlang-wy--<string>-sexp-analyzer
   erlang-wy--<block>-block-analyzer
   erlang-wy--<punctuation>-string-analyzer
-  semantic-lex-default-action
-  )
+  semantic-lex-default-action)
 
 (defun erl-lex-buffer-init ()
   "Set up a buffer for semantic parsing of the Erlang language."
