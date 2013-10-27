@@ -45,13 +45,12 @@
   (erl-lex-test "\"a\""'((STRING   1 . 4))))
 
 (ert-deftest erl-lex-test-number ()
-  ;; Errors such as $aa $@a $\"a etc have to be caught by the grammar
+  ;; Errors such as $aa $@a $\"a 1.2e 3 etc have to be caught by the grammar
   (erl-lex-test "16"     '((NUMBER 1 . 3)))
   (erl-lex-test "16#12"  '((NUMBER 1 . 6)))
   (erl-lex-test "16.12"  '((NUMBER 1 . 6)))
   (erl-lex-test "1.2e4"  '((NUMBER 1 . 6)))
   (erl-lex-test "1.2 e4" '((NUMBER 1 . 4) (ATOM 5 . 7)))
-  (should-error (erl-lex-analyze-string "1.2e 3"))
   (erl-lex-test "$a"    '((NUMBER 1 . 3)))
   (erl-lex-test "$\\a"    '((NUMBER 1 . 4)))
   (erl-lex-test "$\\\"" '((NUMBER 1 . 4)))
@@ -112,9 +111,10 @@
 
 
 (ert-deftest erl-lex-test-expression ()
-  (erl-lex-test "16 + 16"       '((NUMBER 1 . 3) (PLUS 4 . 5) (NUMBER 6 . 8)))
-  (erl-lex-test "16+16"         '((NUMBER 1 . 3) (PLUS 3 . 4) (NUMBER 4 . 6)))
-  (erl-lex-test "16 and 16"     '((NUMBER 1 . 3) (AND  4 . 7) (NUMBER 8 . 10)))
+  (erl-lex-test "16 + 16"       '((NUMBER 1 . 3) (PLUS 4 . 5)   (NUMBER 6 . 8)))
+  (erl-lex-test "16+16"         '((NUMBER 1 . 3) (PLUS 3 . 4)   (NUMBER 4 . 6)))
+  (erl-lex-test "16 and 16"     '((NUMBER 1 . 3) (AND  4 . 7)   (NUMBER 8 . 10)))
+  (erl-lex-test "foo()"         '((ATOM   1 . 4) (LPAREN 4 . 5) (RPAREN 5 . 6)) 1)
   (should-error (erl-lex-string "16and16")))
 
 (provide 'erl-lex-test)
