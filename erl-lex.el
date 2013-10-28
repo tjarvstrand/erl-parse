@@ -31,7 +31,7 @@
 (require 'semantic/lex)
 (require 'erlang)
 
-(when (member 'ert features)
+(when (require 'ert nil t)
   (require 'erl-lex-test))
 
 (define-lex erl-lex

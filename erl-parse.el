@@ -28,12 +28,14 @@
 ;;
 
 ;;; Code:
-(require 'erl-lex)
-(when (member 'ert features)
-  (require 'erl-parse-test))
 
 (require 'semantic/bovine)
 (require 'erlang-wy)
+
+(require 'erl-lex)
+
+(when (require 'ert nil t)
+  (require 'erl-parse-test))
 
 (defun erl-parse-buffer-init ()
   "Set up a buffer for semantic parsing of the Erlang language."
