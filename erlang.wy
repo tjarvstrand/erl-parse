@@ -1,10 +1,8 @@
 ;;; erl-parse/erlang.by -- LL grammar for Erlang language specification
 ;;
-;; Copyright (C) 2002, 2003 Vladimir G. Sekissov
-;; Copyright (C) 2003 David Ponce
+;; Copyright (C) 2013, Thomas Järvstrand
 ;;
-;; Author: Vladimir G. Sekissov <svg@surnet.ru>
-;;         David Ponce <david@dponce.com>
+;; Author: Thomas Järvstrand <tjarvstrand@gmail.com>
 ;;
 ;; This is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -37,9 +35,9 @@
 %package erlang-wy
 %provide erlang-wy
 
-%use-macros erl-parse-macros CALL-TAG
+%use-macros erl-parse-macros {CALL-TAG}
 
-%start         literal
+%start         function-call
 %languagemode  erlang-mode
 
 ;; Punctuation
@@ -115,7 +113,7 @@
 %keyword XOR     "xor"
 
 ;; Basic literal types
-%type <symbol> syntax "[a-zA-Z_][a-zA-Z_@0-9]*\\'"
+%type <symbol> syntax "[a-zA-Z_][a-zA-Z_@0-9]*"
 %token <symbol> VAR    "\\`[A-Z_].*"
 %token <symbol> ATOM   "\\`[a-z].*"
 
@@ -130,6 +128,7 @@
 
 %%
 
-literal
-  : ATOM
+function-call
+  : ATOM PAREN_BLOCK
+    (CALL-TAG nil $1 2)
   ;

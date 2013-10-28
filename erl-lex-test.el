@@ -1,8 +1,8 @@
 ;;; erl-lex.el --- Semantic details for Erlang
 
-;; Copyright (C) 2013 Thomas JÃ¤rvstrand <tjarvstrand@gmail.com>
+;; Copyright (C) 2013 Thomas Järvstrand <tjarvstrand@gmail.com>
 
-;; Author: Thomas JÃ¤rvstrand <tjarvstrand@gmail.com>
+;; Author: Thomas Järvstrand <tjarvstrand@gmail.com>
 
 ;; This file is not part of GNU Emacs.
 

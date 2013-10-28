@@ -1,9 +1,9 @@
 ;;; erlang-wy.el --- Generated parser support file
 
-;; Copyright (C) 2002, 2003 Vladimir G. Sekissov
+;; Copyright (C) 2013, Thomas Järvstrand
 
-;; Author: thomas <thomas@brunsnultra>
-;; Created: 2013-10-27 17:35:24+0100
+;; Author: Thomas Järvstrand <thomas.jarvstrand@stensnultra.internal.machines>
+;; Created: 2013-10-28 14:08:17+0100
 ;; Keywords: syntax
 ;; X-RCS: $Id$
 
@@ -138,7 +138,7 @@
      ("quoted-atom" :declared t)
      ("number" syntax erlang-number-expression)
      ("number" :declared t)
-     ("symbol" syntax "[a-zA-Z_][a-zA-Z_@0-9]*\\'")
+     ("symbol" syntax "[a-zA-Z_][a-zA-Z_@0-9]*")
      ("symbol" :declared t)
      ("keyword" :declared t)
      ("block" :declared t)
@@ -152,9 +152,16 @@
     (wisent-compile-grammar
      '((ASTERISK BANG COLON COMMA CONCATENATE EQUAL EXACTLY_EQUAL GREATER GREATER_OR_EQUAL HASH LBIN LESS LESS_OR_EQUAL LIST_COMP MATCH MINUS NOT_EQUAL NOT_EXACTLY_EQUAL PERIOD PLUS RARROW RBIN SEMICOLON SLASH SUBTRACT VERT_BAR WHY PAREN_BLOCK BRACE_BLOCK BRACK_BLOCK LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK AFTER AND ANDALSO BAND BEGIN BNOT BOR BSL BSR BXOR CASE CATCH DIV ELSE END FUN IF NOT OF OR ORELSE QUERY RECEIVE REM TRY WHEN XOR VAR ATOM NUMBER STRING)
        nil
-       (literal
-        ((ATOM))))
-     '(literal)))
+       (function-call
+        ((ATOM PAREN_BLOCK)
+         (if nil
+             (semantic-tag
+              (format "%s:%s/%s" nil $1 2)
+              'function-call :qualified t)
+           (semantic-tag
+            (format "%s/%s" $1 2)
+            'function-call :qualified nil)))))
+     '(argument-list function-call)))
   "Parser table.")
 
 (defun erlang-wy--install-parser ()
@@ -224,7 +231,7 @@
 
 (define-lex-regex-type-analyzer erlang-wy--<symbol>-regexp-analyzer
   "regexp analyzer for <symbol> tokens."
-  "[a-zA-Z_][a-zA-Z_@0-9]*\\'"
+  "[a-zA-Z_][a-zA-Z_@0-9]*"
   '((ATOM . "\\`[a-z].*")
     (VAR . "\\`[A-Z_].*"))
   'symbol)
