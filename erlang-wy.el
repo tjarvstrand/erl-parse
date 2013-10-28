@@ -3,7 +3,7 @@
 ;; Copyright (C) 2013, Thomas Järvstrand
 
 ;; Author: Thomas Järvstrand <thomas.jarvstrand@stensnultra.internal.machines>
-;; Created: 2013-10-28 14:08:17+0100
+;; Created: 2013-10-28 14:11:47+0100
 ;; Keywords: syntax
 ;; X-RCS: $Id$
 
@@ -161,7 +161,7 @@
            (semantic-tag
             (format "%s/%s" $1 2)
             'function-call :qualified nil)))))
-     '(argument-list function-call)))
+     '(function-call)))
   "Parser table.")
 
 (defun erlang-wy--install-parser ()
