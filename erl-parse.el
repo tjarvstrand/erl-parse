@@ -44,7 +44,7 @@
 (add-hook 'erlang-mode-hook 'erl-parse-buffer-init)
 
 (defun erl-parse-buffer (&optional non-terminal)
-  (semantic-parse-stream (point-min) (point-max) non-terminal))
+  (semantic-parse-region (point-min) (point-max) non-terminal))
 
 (defun erl-parse-string (str &optional non-terminal)
   "Parse STR. If NON-TERMINAL is non-nil, start with that rule."
