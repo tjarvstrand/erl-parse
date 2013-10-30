@@ -2,8 +2,8 @@
 
 ;; Copyright (C) 2013, Thomas Järvstrand
 
-;; Author: Thomas Järvstrand <thomas.jarvstrand@stensnultra.internal.machines>
-;; Created: 2013-10-28 14:11:47+0100
+;; Author: thomas <tjarvstrand@gmail.com>
+;; Created: 2013-10-30 22:41:03+0100
 ;; Keywords: syntax
 ;; X-RCS: $Id$
 
@@ -152,16 +152,84 @@
     (wisent-compile-grammar
      '((ASTERISK BANG COLON COMMA CONCATENATE EQUAL EXACTLY_EQUAL GREATER GREATER_OR_EQUAL HASH LBIN LESS LESS_OR_EQUAL LIST_COMP MATCH MINUS NOT_EQUAL NOT_EXACTLY_EQUAL PERIOD PLUS RARROW RBIN SEMICOLON SLASH SUBTRACT VERT_BAR WHY PAREN_BLOCK BRACE_BLOCK BRACK_BLOCK LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK AFTER AND ANDALSO BAND BEGIN BNOT BOR BSL BSR BXOR CASE CATCH DIV ELSE END FUN IF NOT OF OR ORELSE QUERY RECEIVE REM TRY WHEN XOR VAR ATOM NUMBER STRING)
        nil
+       (expression-list
+        ((expression))
+        ((expression expression-list)))
+       (expression
+        ((literal))
+        ((block))
+        ((VAR)))
        (function-call
         ((ATOM PAREN_BLOCK)
-         (if nil
-             (semantic-tag
-              (format "%s:%s/%s" nil $1 2)
-              'function-call :qualified t)
-           (semantic-tag
-            (format "%s/%s" $1 2)
-            'function-call :qualified nil)))))
-     '(function-call)))
+         (let
+             ((tag-name
+               (if nil
+                   (format "%s:%s/%s" nil $1
+                           (length
+                            (semantic-parse-region
+                             (car $region2)
+                             (cdr $region2)
+                             'argument-list 1)))
+                 (format "%s/%s" $1
+                         (length
+                          (semantic-parse-region
+                           (car $region2)
+                           (cdr $region2)
+                           'argument-list 1))))))
+           (wisent-raw-tag
+            (semantic-tag tag-name 'function-call :qualified
+                          (when nil t)
+                          :module nil :function $1 :arity
+                          (length
+                           (semantic-parse-region
+                            (car $region2)
+                            (cdr $region2)
+                            'argument-list 1))))))
+        ((ATOM COLON ATOM PAREN_BLOCK)
+         (let
+             ((tag-name
+               (if $1
+                   (format "%s:%s/%s" $1 $3
+                           (length
+                            (semantic-parse-region
+                             (car $region2)
+                             (cdr $region2)
+                             'argument-list 1)))
+                 (format "%s/%s" $3
+                         (length
+                          (semantic-parse-region
+                           (car $region2)
+                           (cdr $region2)
+                           'argument-list 1))))))
+           (wisent-raw-tag
+            (semantic-tag tag-name 'function-call :qualified
+                          (when $1 t)
+                          :module $1 :function $3 :arity
+                          (length
+                           (semantic-parse-region
+                            (car $region2)
+                            (cdr $region2)
+                            'argument-list 1)))))))
+       (argument-list
+        ((LPAREN)
+         nil)
+        ((RPAREN)
+         nil)
+        ((expression COMMA)
+         (wisent-raw-tag
+          (semantic-tag $1 'expression)))
+        ((expression RPAREN)
+         (wisent-raw-tag
+          (semantic-tag $1 'expression))))
+       (block
+           ((PAREN_BLOCK))
+         ((BRACE_BLOCK))
+         ((BRACK_BLOCK)))
+       (literal
+        ((ATOM))
+        ((STRING))
+        ((NUMBER))))
+     '(argument-list expression-list function-call)))
   "Parser table.")
 
 (defun erlang-wy--install-parser ()
