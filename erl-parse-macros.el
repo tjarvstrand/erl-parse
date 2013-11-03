@@ -29,16 +29,26 @@
 
 ;;; Code:
 
-(defun erl-parse-macros-CALL-TAG (module function arity &rest attributes)
-  `(let ((tag-name (if ,module
-                       (format "%s:%s/%s" ,module ,function ,arity)
-                     (format "%s/%s" ,function ,arity))))
+(defun erl-parse-macros-CALL-TAG (module function arity qualified)
+  `(let ((tag-name
+          (cond
+           ((and (not ,qualified) ,function)
+            (format "%s/%s" ,function ,arity))
+           ((and (not ,qualified) (not ,function))
+            (format "?/%s" arity))
+           ((and ,qualified ,module ,function)
+            (format "%s:%s/%s" ,module ,function ,arity))
+           ((and ,qualified (not ,module) ,function)
+            (format "?:%s/%s" ,function ,arity))
+           ((and ,qualified ,module (not ,function))
+            (format "%s:?/%s" ,module ,arity))
+           ((and ,qualified (not ,module) (not ,function))
+            (format "?:?/%s" ,arity)))))
      (wisent-raw-tag
-      (semantic-tag tag-name 'function-call
-                    :qualified (when ,module t)
-                    :module   ,module
-                    :function ,function
-                    :arity    , arity
-                    ,@attributes))))
+      (semantic-tag tag-name  'function-call
+                    :module    ,module
+                    :function  ,function
+                    :arity     ,arity
+                    :qualified ,qualified))))
 
 (provide 'erl-parse-macros)

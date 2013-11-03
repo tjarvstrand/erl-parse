@@ -29,42 +29,98 @@
 
 ;;; Code:
 
-(ert-deftest erl-parse-test-function-call ()
-  (let ((tags (erl-parse-string "foo()" 'function-call)))
+(defun erl-parse-test-call-check (str expected &optional  qualified)
+  (let ((tags (erl-parse-string str 'function-call)))
     (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/0"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 6))))
-  (let ((tags (erl-parse-string "foo(a)" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/1"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 7))))
-  (let ((tags (erl-parse-string "foo(\"a\")" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/1"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 9))))
-  (let ((tags (erl-parse-string "foo(1.2)" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/1"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 9))))
-  (let ((tags (erl-parse-string "foo(Var)" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/1"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 9))))
-  (let ((tags (erl-parse-string "foo([])" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/1"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 8))))
-  (let ((tags (erl-parse-string "foo(bar())" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/1"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 11))))
-  (let ((tags (erl-parse-string "foo(bar(), baz, [])" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo/3"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 20))))
-  (let ((tags (erl-parse-string "foo:bar()" 'function-call)))
-    (should (equal (length tags) 1))
-    (should (equal (semantic-tag-name (car tags)) "foo:bar/0"))
-    (should (equal (semantic-tag-bounds (car tags)) '(1 10)))))
+    (should (equal (semantic-tag-name (car tags)) expected))
+    (should (equal (semantic-tag-bounds (car tags)) `(1 ,(1+ (length str)))))
+    (should (equal (semantic-tag-get-attribute (car tags) :qualified)
+                   qualified))))
+
+(ert-deftest erl-parse-test-call ()
+  (erl-parse-test-call-check "f()"                "f/0")
+  (erl-parse-test-call-check "f(a)"               "f/1")
+  (erl-parse-test-call-check "f(\"a\")"           "f/1")
+  (erl-parse-test-call-check "f(1.2)"             "f/1")
+  (erl-parse-test-call-check "f(Var)"             "f/1")
+  (erl-parse-test-call-check "f([])"              "f/1")
+  (erl-parse-test-call-check "f()"                "f/0")
+  (erl-parse-test-call-check "f(b())"             "f/1")
+  (erl-parse-test-call-check "f(b(), baz, [a])"   "f/3")
+  (erl-parse-test-call-check "'f'(b(), baz, [a])" "'f'/3")
+  (erl-parse-test-call-check "F(b(), baz, [a])"   "F/3"))
+
+(ert-deftest erl-parse-test-qualified-call ()
+  (erl-parse-test-call-check "f:b()"     "f:b/0" t)
+  (erl-parse-test-call-check "f:B()"     "f:B/0" t)
+  (erl-parse-test-call-check "f:(b)()"   "f:?/0" t)
+
+  (erl-parse-test-call-check "F:b()"     "F:b/0" t)
+  (erl-parse-test-call-check "F:B()"     "F:B/0" t)
+  (erl-parse-test-call-check "F:(b)()"   "F:?/0" t)
+
+  (erl-parse-test-call-check "(f):b()"   "?:b/0" t)
+  (erl-parse-test-call-check "(f):B()"   "?:B/0" t)
+  (erl-parse-test-call-check "(f):(b)()" "?:?/0" t))
+
+(ert-deftest erl-parse-misc-arg-call ()
+  (erl-parse-test-call-check "f(#record{a = b}, #record2{c = d})" "f/2"))
+
+(ert-deftest erl-parse-bin-arg-call ()
+  (erl-parse-test-call-check "f(<<\"foo\">>)" "f/1")
+  (erl-parse-test-call-check "f(<<(foo)>>)" "f/1")
+  (erl-parse-test-call-check "f(<<Foo>>)" "f/1")
+  (erl-parse-test-call-check "f(<<Foo, Bar>>)" "f/1")
+  (erl-parse-test-call-check "f(<<Foo:8>>)" "f/1")
+  (erl-parse-test-call-check "f(<<Foo/bits>>)" "f/1")
+  (erl-parse-test-call-check "f(<<Foo/bits-signed-little>>)" "f/1"))
+
+(ert-deftest erl-parse-test-operation-arg-call ()
+  (erl-parse-test-call-check "f(-1)" "f/1")
+  (erl-parse-test-call-check "f(+1)" "f/1")
+  (erl-parse-test-call-check "f(+F)" "f/1")
+  (erl-parse-test-call-check "f(a ! b)" "f/1")
+  (erl-parse-test-call-check "f(1 + 1)" "f/1")
+  (erl-parse-test-call-check "f(1 + -F)" "f/1")
+  (erl-parse-test-call-check "f([a] ++ [b])" "f/1")
+  (erl-parse-test-call-check "f([a] =:= [b])" "f/1"))
+
+;; TODO macros, named funs
+
+(ert-deftest erl-parse-test-misc-expression-arg-call ()
+  (erl-parse-test-call-check "f(catch f(), a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(begin f, a, b end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(case f of b -> ok end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(case f of b -> ok; b2 -> error end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(if t -> b end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(if t -> b; f -> baz end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(receive t -> f end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(receive t -> f; f -> b end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(receive t -> b after 1 -> ok end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(receive t -> b after 1 -> ok end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(receive t -> b after 1 -> ok; 2 -> ok end, a)"
+                             "f/2")
+  (erl-parse-test-call-check "f(try f1 catch f2 -> ok1 end)"
+                             "f/1")
+  (erl-parse-test-call-check "f(try f1 catch f2:b2 -> ok1 end)"
+                             "f/1")
+  (erl-parse-test-call-check "f(try f1 of b -> ok catch f2:b2 -> ok1 end)"
+                             "f/1")
+  (erl-parse-test-call-check "f(fun b/1)"
+                             "f/1")
+  (erl-parse-test-call-check "f(fun(A, B) -> ok end)"
+                             "f/1")
+  (erl-parse-test-call-check "f(fun(A, B) -> foo(), ok end)"
+                             "f/1"))
 
 (provide 'erl-parse-test)
