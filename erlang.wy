@@ -78,7 +78,7 @@
 %token <punctuation> SUBTRACT          "--"
 ;; Not used yet
 ;; %token <punctuation> VERT_BAR          "|"
-;; %token <punctuation> WHY               "?"
+%token <punctuation> WHY               "?"
 
 ;; Blocks & Parenthesis
 %type  <block>
@@ -119,8 +119,7 @@
 %keyword RECEIVE "receive"
 %keyword REM     "rem"
 %keyword TRY     "try"
-;; Not used yet
-;; %keyword WHEN    "when"
+%keyword WHEN    "when"
 %keyword XOR     "xor"
 
 ;; Basic literal types
@@ -166,7 +165,7 @@ unary-expression
   | literal
   | record
   | block
-  | code-block
+  | begin
   | case
   | fun
   | if
@@ -266,7 +265,7 @@ number
   | FLOAT
   ;
 
-code-block
+begin
   : BEGIN expression-list END
   ;
 
@@ -276,8 +275,8 @@ case
 
 fun
   : FUN function-name-component SLASH INT
-  | FUN PAREN_BLOCK RARROW expression-list END
-  | FUN VAR PAREN_BLOCK RARROW expression-list END
+  | FUN PAREN_BLOCK optional-guard RARROW expression-list END
+  | FUN VAR PAREN_BLOCK optional-guard RARROW expression-list END
   ;
 
 if
@@ -320,7 +319,18 @@ optional-match-clauses
   ;
 
 match-clause
-  : expression RARROW expression-list
+  : expression optional-guard RARROW expression-list
+  ;
+
+optional-guard
+  : WHEN expression optional-guard-expressions
+  | ;; Empty
+  ;
+
+optional-guard-expressions
+  : COMMA expression optional-guard-expressions
+  | SEMICOLON expression optional-guard-expressions
+  | ;; Empty
   ;
 
 infix-operator
