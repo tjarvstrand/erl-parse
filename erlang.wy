@@ -227,10 +227,9 @@ bit-syntax-element
   : bit-syntax-value optional-bit-syntax-size optional-bit-syntax-type-spec
   ;
 
-;; FIXME Lexer should allow using an integer here
 optional-bit-syntax-size
   : COLON VAR
-  | COLON NUMBER
+  | COLON INT
   | COLON PAREN_BLOCK
   | ;; Empty
   ;
@@ -245,23 +244,27 @@ optional-bit-syntax-type
   | ;; Empty
   ;
 
-;; FIXME Lexer should allow using an integer here
 bit-syntax-type
   : ATOM
-  | ATOM COLON NUMBER
+  | ATOM COLON INT
   ;
 
 bit-syntax-value
   : VAR
   | STRING
-  | NUMBER
+  | number
   | PAREN_BLOCK
   ;
 
 literal
   : ATOM
   | STRING
-  | NUMBER
+  | number
+  ;
+
+number
+  : INT
+  | FLOAT
   ;
 
 code-block
@@ -272,9 +275,8 @@ case
   : CASE expression OF match-clauses END
   ;
 
-;; FIXME The lexer should allow using an integer here!
 fun
-  : FUN function-name-component SLASH NUMBER
+  : FUN function-name-component SLASH INT
   | FUN PAREN_BLOCK RARROW expression-list END
   ;
 
