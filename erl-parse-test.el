@@ -29,6 +29,8 @@
 
 ;;; Code:
 
+;; TODO macros, named funs, matches, binary matches, guards
+
 (defun erl-parse-test-call-check (str expected &optional  qualified)
   (let ((tags (erl-parse-string str 'function-call)))
     (should (equal (length tags) 1))
@@ -39,6 +41,7 @@
 
 (ert-deftest erl-parse-test-call ()
   (erl-parse-test-call-check "f()"                "f/0")
+  (erl-parse-test-call-check "f(1)"               "f/1")
   (erl-parse-test-call-check "f(a)"               "f/1")
   (erl-parse-test-call-check "f(\"a\")"           "f/1")
   (erl-parse-test-call-check "f(1.2)"             "f/1")
@@ -48,7 +51,8 @@
   (erl-parse-test-call-check "f(b())"             "f/1")
   (erl-parse-test-call-check "f(b(), baz, [a])"   "f/3")
   (erl-parse-test-call-check "'f'(b(), baz, [a])" "'f'/3")
-  (erl-parse-test-call-check "F(b(), baz, [a])"   "F/3"))
+  (erl-parse-test-call-check "F(b(), baz, [a])"   "F/3")
+  (erl-parse-test-call-check "?f(b(), baz, [a])"   "?/3"))
 
 (ert-deftest erl-parse-test-qualified-call ()
   (erl-parse-test-call-check "f:b()"     "f:b/0" t)
@@ -85,7 +89,11 @@
   (erl-parse-test-call-check "f([a] ++ [b])" "f/1")
   (erl-parse-test-call-check "f([a] =:= [b])" "f/1"))
 
-;; TODO macros, named funs
+
+(ert-deftest erl-parse-test-macro-arg-call ()
+  (erl-parse-test-call-check "f(?macro, a)" "f/2")
+  (erl-parse-test-call-check "f(?macro(a), a)" "f/2")
+  (erl-parse-test-call-check "f(?macro(a)(), a)" "f/2"))
 
 (ert-deftest erl-parse-test-misc-expression-arg-call ()
   (erl-parse-test-call-check "f(catch f(), a)"

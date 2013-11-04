@@ -21,14 +21,16 @@
 ;;
 
 %{
-  (defconst erlang-number-expression
+  (defconst erlang-int-expression
     (concat "\\("
-          "\\([0-9]+\\.[0-9]+\\([eE][+-]?[0-9]+\\)?\\)" ;; float
-          "\\|"
-          "\\(\\([0123]?[0-9]#\\)?[0-9]+\\)" ;; integer
-          "\\|"
-          "\\(\\$\\\\?.\\)" ;; char
-          "\\)")
+            "\\(\\([0123]?[0-9]#\\)?[0-9]+\\)" ;; integer
+            "\\|"
+            "\\(\\$\\\\?.\\)" ;; char
+            "\\)")
+    "Regexp describing an Erlang integer expression")
+
+  (defconst erlang-float-expression
+    "\\([0-9]+\\.[0-9]+\\([eE][+-]?[0-9]+\\)?\\)"
     "Regexp describing an Erlang number expression")
 %}
 
@@ -60,20 +62,23 @@
 %token <punctuation> LBIN              "<<"
 %token <punctuation> LESS              "<"
 %token <punctuation> LESS_OR_EQUAL     "=<"
-%token <punctuation> LIST_COMP         "||"
+;; Not used yet
+;; %token <punctuation> LIST_COMP         "||"
 %token <punctuation> MATCH             "="
 %token <punctuation> MINUS             "-"
 %token <punctuation> NOT_EQUAL         "/="
 %token <punctuation> NOT_EXACTLY_EQUAL "=/="
-%token <punctuation> PERIOD            "."
+;; Not used yet
+;; %token <punctuation> PERIOD            "."
 %token <punctuation> PLUS              "+"
 %token <punctuation> RARROW            "->"
 %token <punctuation> RBIN              ">>"
 %token <punctuation> SEMICOLON         ";"
 %token <punctuation> SLASH             "/"
 %token <punctuation> SUBTRACT          "--"
-%token <punctuation> VERT_BAR          "|"
-%token <punctuation> WHY               "?"
+;; Not used yet
+;; %token <punctuation> VERT_BAR          "|"
+;; %token <punctuation> WHY               "?"
 
 ;; Blocks & Parenthesis
 %type  <block>
@@ -102,7 +107,6 @@
 %keyword CASE    "case"
 %keyword CATCH   "catch"
 %keyword DIV     "div"
-%keyword ELSE    "else"
 %keyword END     "end"
 %keyword FUN     "fun"
 %keyword IF      "if"
@@ -110,11 +114,13 @@
 %keyword OF      "of"
 %keyword OR      "or"
 %keyword ORELSE  "orelse"
-%keyword QUERY   "query"
+;; Not used
+;; %keyword QUERY   "query"
 %keyword RECEIVE "receive"
 %keyword REM     "rem"
 %keyword TRY     "try"
-%keyword WHEN    "when"
+;; Not used yet
+;; %keyword WHEN    "when"
 %keyword XOR     "xor"
 
 ;; Basic literal types
@@ -122,8 +128,12 @@
 %token <symbol> VAR    "\\`[A-Z_].*"
 %token <symbol> ATOM   "\\`[a-z].*"
 
-%type <number> syntax erlang-number-expression
-%token <number> NUMBER ".*"
+%type <int> syntax erlang-int-expression
+%token <int> INT ".*"
+
+%type <float> syntax erlang-float-expression
+%token <float> FLOAT ".*"
+
 
 %type <quoted-atom> syntax "'.*" matchdatatype sexp
 %token <quoted-atom> ATOM

@@ -40,7 +40,8 @@
   semantic-lex-ignore-newline
   semantic-lex-ignore-comments
   erlang-wy--<keyword>-keyword-analyzer
-  erlang-wy--<number>-regexp-analyzer
+  erlang-wy--<int>-regexp-analyzer
+  erlang-wy--<float>-regexp-analyzer
   erlang-wy--<symbol>-regexp-analyzer
   erlang-wy--<quoted-atom>-sexp-analyzer
   erlang-wy--<string>-sexp-analyzer
