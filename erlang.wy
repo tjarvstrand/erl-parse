@@ -155,7 +155,6 @@ optional-expression-list
 expression
   : unary-expression
   | unary-expression infix-operator expression
-  | match-term MATCH expression
   ;
 
 
@@ -321,18 +320,12 @@ optional-match-clauses
   ;
 
 match-clause
-  : match-term RARROW expression-list
-  ;
-
-match-term
-  : VAR
-  | literal
-  | block
-  | STRING CONCATENATE match-term
+  : expression RARROW expression-list
   ;
 
 infix-operator
   : BANG
+  | MATCH
   | arithmetic-operator
   | bitwise-operator
   | boolean-operator

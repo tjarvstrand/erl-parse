@@ -83,12 +83,12 @@
   (erl-parse-test-call-check "f(-1)" "f/1")
   (erl-parse-test-call-check "f(+1)" "f/1")
   (erl-parse-test-call-check "f(+F)" "f/1")
+  (erl-parse-test-call-check "f(a = b)" "f/1")
   (erl-parse-test-call-check "f(a ! b)" "f/1")
   (erl-parse-test-call-check "f(1 + 1)" "f/1")
   (erl-parse-test-call-check "f(1 + -F)" "f/1")
   (erl-parse-test-call-check "f([a] ++ [b])" "f/1")
   (erl-parse-test-call-check "f([a] =:= [b])" "f/1"))
-
 
 (ert-deftest erl-parse-test-macro-arg-call ()
   (erl-parse-test-call-check "f(?macro, a)" "f/2")
