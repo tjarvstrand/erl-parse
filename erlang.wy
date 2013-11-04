@@ -278,6 +278,7 @@ case
 fun
   : FUN function-name-component SLASH INT
   | FUN PAREN_BLOCK RARROW expression-list END
+  | FUN VAR PAREN_BLOCK RARROW expression-list END
   ;
 
 if

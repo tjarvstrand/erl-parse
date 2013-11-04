@@ -67,10 +67,10 @@
   (erl-parse-test-call-check "(f):B()"   "?:B/0" t)
   (erl-parse-test-call-check "(f):(b)()" "?:?/0" t))
 
-(ert-deftest erl-parse-misc-arg-call ()
+(ert-deftest erl-parse-test-misc-arg-call ()
   (erl-parse-test-call-check "f(#record{a = b}, #record2{c = d})" "f/2"))
 
-(ert-deftest erl-parse-bin-arg-call ()
+(ert-deftest erl-parse-test-bin-arg-call ()
   (erl-parse-test-call-check "f(<<\"foo\">>)" "f/1")
   (erl-parse-test-call-check "f(<<(foo)>>)" "f/1")
   (erl-parse-test-call-check "f(<<Foo>>)" "f/1")
@@ -129,6 +129,8 @@
   (erl-parse-test-call-check "f(fun(A, B) -> ok end)"
                              "f/1")
   (erl-parse-test-call-check "f(fun(A, B) -> foo(), ok end)"
+                             "f/1")
+  (erl-parse-test-call-check "f(fun Var(A, B) -> foo(), ok end)"
                              "f/1"))
 
 (provide 'erl-parse-test)
