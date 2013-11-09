@@ -1,4 +1,4 @@
-;;; erl-lex.el --- Semantic details for Erlang
+;;; erl-lex-test.el --- Tests for erl-lex.el
 
 ;; Copyright (C) 2013 Thomas Järvstrand <tjarvstrand@gmail.com>
 

@@ -1,4 +1,4 @@
-;;; erl-lex.el --- Semantic details for Erlang
+;;; erl-lex.el --- Lexical analysis for Erlang
 
 ;; Copyright (C) 2013 Thomas Järvstrand <tjarvstrand@gmail.com>
 
@@ -59,6 +59,15 @@
    semantic-lex-analyzer          'erl-lex
    semantic-flex-keywords-obarray erlang-wy--keyword-table)
   (semantic-lex-init))
+
+(defun erl-lex-region (start end &optional depth length)
+  "Lexically analyze text in the current buffer between START and END.
+Optional argument DEPTH indicates at what level to scan over entire
+lists.  The last argument, LENGTH specifies that `erl-lex' should only
+ return LENGTH tokens.  The return value is a token stream, see
+`semantic-lex'."
+  (let ((case-fold-search nil))
+    (semantic-lex start end depth length)))
 
 (defun erl-lex-buffer (&optional depth)
   (let ((case-fold-search nil))
