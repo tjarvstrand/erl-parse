@@ -39,13 +39,12 @@
 
 %use-macros erl-parse-macros {CALL-TAG}
 
-%start         parameter-list
-%start         function-call
+%start module
+%start attribute-parameters
+%start parameter-list
+%start function-call
 
 %languagemode  erlang-mode
-
-%left OPERATION
-%left PREFIX-OPERATION
 
 ;; Punctuation
 %type <punctuation>
@@ -62,22 +61,19 @@
 %token <punctuation> LBIN              "<<"
 %token <punctuation> LESS              "<"
 %token <punctuation> LESS_OR_EQUAL     "=<"
-;; Not used yet
-;; %token <punctuation> LIST_COMP         "||"
+%token <punctuation> LIST_COMP         "||"
 %token <punctuation> MATCH             "="
 %token <punctuation> MINUS             "-"
 %token <punctuation> NOT_EQUAL         "/="
 %token <punctuation> NOT_EXACTLY_EQUAL "=/="
-;; Not used yet
-;; %token <punctuation> PERIOD            "."
+%token <punctuation> PERIOD            "."
 %token <punctuation> PLUS              "+"
 %token <punctuation> RARROW            "->"
 %token <punctuation> RBIN              ">>"
 %token <punctuation> SEMICOLON         ";"
 %token <punctuation> SLASH             "/"
 %token <punctuation> SUBTRACT          "--"
-;; Not used yet
-;; %token <punctuation> VERT_BAR          "|"
+%token <punctuation> VERT_BAR          "|"
 %token <punctuation> WHY               "?"
 
 ;; Blocks & Parenthesis
@@ -142,6 +138,23 @@
 
 %%
 
+module
+  : attribute
+  ;
+
+
+attribute
+  : MINUS ATOM attribute-parameters PERIOD
+    (TAG $2 'attribute :parameters $3)
+  ;
+
+attribute-parameters
+  : non-parenthesized-expression
+    (list (TAG $1 'parameter))
+  | PAREN_BLOCK
+    (EXPANDFULL $1 parameter-list)
+  ;
+
 expression-list
   : expression optional-expression-list
   ;
@@ -151,20 +164,34 @@ optional-expression-list
   | ;; Empty
   ;
 
-expression
-  : unary-expression
-  | unary-expression infix-operator expression
+non-parenthesized-expression
+  : non-parenthesized-unary-expression
+  | non-parenthesized-unary-expression infix-operator expression
   ;
 
+non-parenthesized-unary-expression
+  : BRACE_BLOCK
+  | BRACK_BLOCK
+  | unary-expression
+  ;
+
+expression
+  : unary-expression-or-block
+  | unary-expression-or-block infix-operator expression
+  ;
+
+unary-expression-or-block
+  : unary-expression
+  | block
+  ;
 
 unary-expression
   : VAR
-  | CATCH unary-expression
-  | prefix-operator unary-expression
+  | CATCH unary-expression-or-block
+  | prefix-operator unary-expression-or-block
   | bit-syntax
   | literal
   | record
-  | block
   | begin
   | case
   | fun
@@ -193,9 +220,9 @@ parameter-list
   | RPAREN
     ()
   | expression COMMA
-    (TAG $1 'expression)
+    (TAG $1 'parameter)
   | expression RPAREN
-    (TAG $1 'expression)
+    (TAG $1 'parameter)
   ;
 
 block

@@ -35,7 +35,8 @@
 (require 'erl-lex)
 
 (when (require 'ert nil t)
-  (require 'erl-parse-test))
+  (require 'erl-parse-test-call)
+  (require 'erl-parse-test-module))
 
 (defun erl-parse-buffer-init ()
   "Set up a buffer for semantic parsing of the Erlang language."
@@ -43,15 +44,28 @@
   (erlang-wy--install-parser))
 (add-hook 'erlang-mode-hook 'erl-parse-buffer-init)
 
-(defun erl-parse-buffer (&optional non-terminal)
-  (semantic-parse-region (point-min) (point-max) non-terminal))
+(defun erl-parse-buffer (&optional non-terminal allow-errors)
+  "Parse the erlang code in current buffer. NON-TERMINAL is the starting
+non-terminal if known. If there where parse errors; return the parsing
+result if ALLOW-ERRORS is non-nil, otherwise nil."
+  (let ((res (semantic-parse-region (point-min) (point-max) non-terminal)))
+    (unless (and (> wisent-nerrs 0) (not allow-errors))
+      res)))
 
-(defun erl-parse-string (str &optional non-terminal)
+(defun erl-parse-stream (stream &optional non-terminal allow-errors)
+  "Parse the erlang lexical tokens in STREAM. NON-TERMINAL is the starting
+non-terminal if known. If there where parse errors; return the parsing
+result if ALLOW-ERRORS is non-nil, otherwise nil."
+  (let ((res (semantic-parse-stream stream non-terminal)))
+    (unless (and (> wisent-nerrs 0) (not allow-errors))
+      res)))
+
+(defun erl-parse-string (str &optional non-terminal allow-errors)
   "Parse STR. If NON-TERMINAL is non-nil, start with that rule."
   (with-temp-buffer
     (erl-parse-buffer-init)
     (insert str)
-    (erl-parse-buffer non-terminal)))
+    (erl-parse-buffer non-terminal allow-errors)))
 
 (provide 'erl-parse)
 
