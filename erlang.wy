@@ -194,14 +194,18 @@ unary-expression
   | record
   | begin
   | case
-  | fun
+  | anonymous-function
   | if
   | receive
   | try
   ;
 
 function-call
-  : function-name-component PAREN_BLOCK
+  : FUN function-name-component SLASH INT
+    (CALL-TAG nil $2 (string-to-number $4) nil)
+  | FUN function-name-component COLON function-name-component SLASH INT
+    (CALL-TAG $2 $4 (string-to-number $4) t)
+  | function-name-component PAREN_BLOCK
     (CALL-TAG nil $1 (length (EXPANDFULL $2 parameter-list)) nil)
   | function-name-component COLON function-name-component PAREN_BLOCK
     (CALL-TAG $1 $3 (length (EXPANDFULL $4 parameter-list)) t)
@@ -300,9 +304,8 @@ case
   : CASE expression OF match-clauses END
   ;
 
-fun
-  : FUN function-name-component SLASH INT
-  | FUN PAREN_BLOCK optional-guard RARROW expression-list END
+anonymous-function
+  : FUN PAREN_BLOCK optional-guard RARROW expression-list END
   | FUN VAR PAREN_BLOCK optional-guard RARROW expression-list END
   ;
 
