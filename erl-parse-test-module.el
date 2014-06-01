@@ -39,7 +39,6 @@
     (should (equal (semantic-tag-class tag) expected-class))
     (should (equal (semantic-tag-bounds tag) `(1 ,(1+ (length str)))))
     (loop for (attr . val) in attrs
-          do  (message "val %s" val)
           do  (should (equal val (semantic-tag-get-attribute tag attr))))))
 
 (ert-deftest erl-parse-test-module-decl ()
