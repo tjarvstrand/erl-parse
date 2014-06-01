@@ -40,8 +40,8 @@
   semantic-lex-ignore-newline
   semantic-lex-ignore-comments
   erlang-wy--<keyword>-keyword-analyzer
-  erlang-wy--<int>-regexp-analyzer
   erlang-wy--<float>-regexp-analyzer
+  erlang-wy--<int>-regexp-analyzer
   erlang-wy--<symbol>-regexp-analyzer
   erlang-wy--<quoted-atom>-sexp-analyzer
   erlang-wy--<string>-sexp-analyzer
@@ -78,5 +78,15 @@ lists.  The last argument, LENGTH specifies that `erl-lex' should only
         (erl-lex-buffer-init)
         (insert str)
         (erl-lex-buffer depth)))
+
+(defun erl-lex-block-p (token)
+  "Return non-nil if TOKEN is a parenthesis-, brace- or bracket block."
+  (member (semantic-lex-token-class token)
+          '(PAREN_BLOCK BRACE_BLOCK BRACK_BLOCK)))
+
+(defun erl-lex-block-p (token)
+  "Return non-nil if TOKEN is a parenthesis-, brace- or bracket block."
+  (member (semantic-lex-token-class token)
+          '(PAREN_BLOCK BRACE_BLOCK BRACK_BLOCK)))
 
 (provide 'erl-lex)

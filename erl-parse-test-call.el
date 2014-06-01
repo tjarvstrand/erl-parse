@@ -63,7 +63,7 @@
 
 (ert-deftest erl-parse-test-call-fun ()
   (erl-parse-test-call-check "fun f/0" "f/0")
-  (erl-parse-test-call-check "fun f:b/0" "f:b/0") t)
+  (erl-parse-test-call-check "fun f:b/0" "f:b/0" t))
 
 (ert-deftest erl-parse-test-qualified-call ()
   (erl-parse-test-call-check "f:b()"     "f:b/0" t)

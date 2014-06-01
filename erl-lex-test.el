@@ -46,15 +46,15 @@
 
 (ert-deftest erl-lex-test-number ()
   ;; Errors such as $aa $@a $\"a 1.2e 3 etc have to be caught by the grammar
-  (erl-lex-test "16"     '((NUMBER 1 . 3)))
-  (erl-lex-test "16#12"  '((NUMBER 1 . 6)))
-  (erl-lex-test "16.12"  '((NUMBER 1 . 6)))
-  (erl-lex-test "1.2e4"  '((NUMBER 1 . 6)))
-  (erl-lex-test "1.2 e4" '((NUMBER 1 . 4) (ATOM 5 . 7)))
-  (erl-lex-test "$a"    '((NUMBER 1 . 3)))
-  (erl-lex-test "$\\a"    '((NUMBER 1 . 4)))
-  (erl-lex-test "$\\\"" '((NUMBER 1 . 4)))
-  (erl-lex-test "$\"" '((NUMBER 1 . 3)))
+  (erl-lex-test "16"     '((INT 1 . 3)))
+  (erl-lex-test "16#12"  '((INT 1 . 6)))
+  (erl-lex-test "16.12"  '((FLOAT 1 . 6)))
+  (erl-lex-test "1.2e4"  '((FLOAT 1 . 6)))
+  (erl-lex-test "1.2 e4" '((FLOAT 1 . 4) (ATOM 5 . 7)))
+  (erl-lex-test "$a"     '((INT 1 . 3)))
+  (erl-lex-test "$\\a"   '((INT 1 . 4)))
+  (erl-lex-test "$\\\""  '((INT 1 . 4)))
+  (erl-lex-test "$\""    '((INT 1 . 3)))
   (should-error (erl-lex-analyze-string "$")))
 
 (ert-deftest erl-lex-test-punctuation ()
@@ -83,7 +83,7 @@
   (erl-lex-test ";"   '((SEMICOLON         1 . 2)))
   (erl-lex-test "*"   '((ASTERISK          1 . 2)))
   (erl-lex-test "||"  '((LIST_COMP         1 . 3)))
-  (erl-lex-test "|"   '((VERT_BAR          1 . 2)))
+  (erl-lex-test "|"   '((CONS              1 . 2)))
   (erl-lex-test "?"   '((WHY               1 . 2))))
 
 (ert-deftest erl-lex-test-paren ()
@@ -111,9 +111,9 @@
 
 
 (ert-deftest erl-lex-test-expression ()
-  (erl-lex-test "16 + 16"       '((NUMBER 1 . 3) (PLUS 4 . 5)   (NUMBER 6 . 8)))
-  (erl-lex-test "16+16"         '((NUMBER 1 . 3) (PLUS 3 . 4)   (NUMBER 4 . 6)))
-  (erl-lex-test "16 and 16"     '((NUMBER 1 . 3) (AND  4 . 7)   (NUMBER 8 . 10)))
+  (erl-lex-test "16 + 16"       '((INT 1 . 3) (PLUS 4 . 5)   (INT 6 . 8)))
+  (erl-lex-test "16+16"         '((INT 1 . 3) (PLUS 3 . 4)   (INT 4 . 6)))
+  (erl-lex-test "16 and 16"     '((INT 1 . 3) (AND  4 . 7)   (INT 8 . 10)))
   (erl-lex-test "foo()"         '((ATOM   1 . 4) (LPAREN 4 . 5) (RPAREN 5 . 6)) 1)
   (should-error (erl-lex-string "16and16")))
 
