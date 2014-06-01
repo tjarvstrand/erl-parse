@@ -56,10 +56,7 @@
   (erl-parse-test-call-check "f(b())"             "f/1")
   (erl-parse-test-call-check "f(b(), baz, [a])"   "f/3")
   (erl-parse-test-call-check "'f'(b(), baz, [a])" "'f'/3")
-  (erl-parse-test-call-check "F(b(), baz, [a])"   "F/3")
-  ;; Can't parse this yet.
-  ;; (erl-parse-test-call-check "?f()"   "?/0")
-  )
+  (erl-parse-test-call-check "F(b(), baz, [a])"   "F/3"))
 
 (ert-deftest erl-parse-test-call-fun ()
   (erl-parse-test-call-check "fun f/0" "f/0")

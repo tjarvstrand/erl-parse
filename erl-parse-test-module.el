@@ -32,11 +32,8 @@
 ;; TODO macros, named funs, matches, binary matches, guards
 
 (defun erl-parse-test-module-check (str expected-name expected-class attrs)
-  ;; (message "tokens %s" (erl-lex-analyze-string str))
   (let* ((tags (erl-parse-string str 'module))
          (tag  (car tags)))
-    (message "tags %s" tags)
-    (message "class %s" (semantic-tag-class (car tags)))
     (should (equal (length tags) 1))
     (should (equal (semantic-tag-name tag) expected-name))
     (should (equal (semantic-tag-class tag) expected-class))
